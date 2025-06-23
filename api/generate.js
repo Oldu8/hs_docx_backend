@@ -27,8 +27,6 @@ module.exports = async (req, res) => {
     templateFilename
   );
 
-  console.log(templatePath);
-
   let content;
 
   try {
@@ -54,18 +52,6 @@ module.exports = async (req, res) => {
       .generate({ type: "nodebuffer" })
       .toString("base64");
 
-    // return {
-    //   statusCode: 200,
-    //   body: {
-    //     success: true,
-    //     message: "DOCX document generated",
-    //     filename: `institution_quote_${Date.now()}.docx`,
-    //     document: buffer,
-    //     mimeType:
-    //       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    //   },
-    // };
-
     res.send({
       success: true,
       message: "DOCX document generated",
@@ -74,16 +60,6 @@ module.exports = async (req, res) => {
       mimeType:
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     });
-    // res.setHeader(
-    //   "Content-Type",
-    //   "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    // );
-    // res.setHeader(
-    //   "Content-Disposition",
-    //   `attachment; filename="${doc_name}_${Date.now()}.docx"`
-    // );
-
-    // res.send(buffer);
   } catch (err) {
     return res
       .status(500)
