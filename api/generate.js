@@ -11,8 +11,76 @@ const NAME_FILE_MAP = {
   SOW_v250609: "SOW_v250609.docx",
 };
 
+function getProductStats(products = []) {
+  return products.reduce(
+    (acc, product) => {
+      const { cost, eras_program__sync_ } = product.properties || {};
+      const numericCost = parseFloat(cost) || 0;
+      const isEras = eras_program__sync_ === "true";
+
+      acc.all_count += 1;
+
+      if (isEras) {
+        acc.e_sum += numericCost;
+        acc.eras_count += 1;
+      } else {
+        acc.ne_sum += numericCost;
+        acc.non_eras_count += 1;
+      }
+
+      return acc;
+    },
+    {
+      e_sum: 0,
+      ne_sum: 0,
+      all_count: 0,
+      eras_count: 0,
+      non_eras_count: 0,
+    }
+  );
+}
+
+const example_of_data = {
+  institution_name: "Novant Health",
+  gme_id: "369558",
+  address: {
+    street: "19475 Old Jetton Road, Suite 200",
+    city: undefined,
+    state: "NC",
+    zip: "28031",
+  },
+  products: [
+    {
+      id: "27292540513",
+      properties: {
+        eras_program__sync_: "true",
+        associated_program_id__sync_: "1394800001",
+        cost: "4000",
+        hs_object_id: "27292540513",
+        product_name: "Thalamus Video",
+        specialty: "Clinical informatics (Internal medicine)",
+        thalamus_core_id__sync_: "11685",
+      },
+    },
+  ],
+};
+
 module.exports = async (req, res) => {
   const { doc_name, data } = req.body;
+
+  console.log(data);
+
+  const { street, city, state, zip } = data.address || {};
+  const parts = [street, city, state, zip].filter(Boolean);
+
+  const stats = getProductStats(data.products);
+
+  const dataForDocument = {
+    institution_name: data.institution_name,
+    gme_id: data.gme_id,
+    customer_address: parts.join(", "),
+    ...stats,
+  };
 
   const templateFilename = NAME_FILE_MAP[doc_name];
 
@@ -44,7 +112,7 @@ module.exports = async (req, res) => {
       linebreaks: true,
     });
 
-    doc.setData(data);
+    doc.setData(dataForDocument);
     doc.render();
 
     const buffer = doc
