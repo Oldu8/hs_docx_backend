@@ -11,6 +11,37 @@ const NAME_FILE_MAP = {
   SOW_v250609: "SOW_v250609.docx",
 };
 
+function splitProducts(products) {
+  let countEras = 1;
+  let countNonEras = 1;
+
+  const eras_programs = [];
+  const non_eras_programs = [];
+
+  for (const product of products) {
+    const props = product.properties || {};
+    const isEras = props.eras_program__sync_ === "true";
+    const base = {
+      acgme_id: props.associated_program_id__sync_ || "",
+      specialty: props.specialty || "",
+      ts_id: props.thalamus_core_id__sync_ || "",
+      cost: props.cost || "0",
+    };
+
+    if (isEras) {
+      eras_programs.push({ ...base, count: countEras++ });
+    } else {
+      non_eras_programs.push({
+        ...base,
+        // core_price: "3000",
+        count: countNonEras++,
+      });
+    }
+  }
+
+  return { eras_programs, non_eras_programs };
+}
+
 function getProductStats(products = []) {
   return products.reduce(
     (acc, product) => {
@@ -19,6 +50,7 @@ function getProductStats(products = []) {
       const isEras = eras_program__sync_ === "true";
 
       acc.all_count += 1;
+      acc.total += numericCost;
 
       if (isEras) {
         acc.e_sum += numericCost;
@@ -36,6 +68,7 @@ function getProductStats(products = []) {
       all_count: 0,
       eras_count: 0,
       non_eras_count: 0,
+      total: 0,
     }
   );
 }
@@ -74,13 +107,18 @@ module.exports = async (req, res) => {
   const parts = [street, city, state, zip].filter(Boolean);
 
   const stats = getProductStats(data.products);
+  const { eras_programs, non_eras_programs } = splitProducts(data.products);
 
   const dataForDocument = {
     institution_name: data.institution_name,
     gme_id: data.gme_id,
     customer_address: parts.join(", "),
+    eras_programs: eras_programs,
+    non_eras_programs: non_eras_programs,
     ...stats,
   };
+
+  console.log(dataForDocument);
 
   const templateFilename = NAME_FILE_MAP[doc_name];
 
