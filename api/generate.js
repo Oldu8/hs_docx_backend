@@ -16,28 +16,53 @@ function splitProducts(products) {
   let countNonEras = 1;
 
   const eras_programs = [];
-  const non_eras_programs = [];
+  const nonErasMap = new Map(); // ключ — associated_program_id__sync_
 
   for (const product of products) {
     const props = product.properties || {};
     const isEras = props.eras_program__sync_ === "true";
-    const base = {
-      acgme_id: props.associated_program_id__sync_ || "",
-      specialty: props.specialty || "",
-      ts_id: props.thalamus_core_id__sync_ || "",
-      cost: props.cost || "0",
-    };
+    const acgme_id = props.associated_program_id__sync_ || "";
+    const specialty = props.specialty || "";
+    const ts_id = props.thalamus_core_id__sync_ || "";
+    const cost = parseFloat(props.cost) || 0;
+    const name = (props.product_name || "").toLowerCase();
 
     if (isEras) {
-      eras_programs.push({ ...base, count: countEras++ });
-    } else {
-      non_eras_programs.push({
-        ...base,
-        // core_price: "3000",
-        count: countNonEras++,
+      eras_programs.push({
+        count: countEras++,
+        acgme_id,
+        specialty,
+        ts_id,
+        v_price: cost,
+        t_price: cost,
       });
+    } else {
+      if (!nonErasMap.has(acgme_id)) {
+        nonErasMap.set(acgme_id, {
+          count: countNonEras++,
+          acgme_id,
+          specialty,
+          ts_id,
+          c_price: 0,
+          v_price: 0,
+          t_price: 0,
+        });
+      }
+
+      const entry = nonErasMap.get(acgme_id);
+
+      if (name.includes("core")) {
+        entry.c_price = cost;
+      } else if (name.includes("video")) {
+        entry.v_price = cost;
+      }
+
+      // Всегда пересчитываем total
+      entry.t_price = entry.c_price + entry.v_price;
     }
   }
+
+  const non_eras_programs = Array.from(nonErasMap.values());
 
   return { eras_programs, non_eras_programs };
 }
