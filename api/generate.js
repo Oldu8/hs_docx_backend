@@ -62,11 +62,14 @@ module.exports = async (req, res) => {
     doc.render(dataForDocument);
 
     const buffer = doc.getZip().generate({ type: "nodebuffer" });
-    const fomrated_date = new Date().toLocaleDateString("en-US", {
-      month: "2-digit",
-      day: "2-digit",
-      year: "numeric",
-    });
+    const fomrated_date = new Date()
+      .toLocaleDateString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+      })
+      .replace(/\//g, "_");
+
     const outputFilename = `${deal_name}_${doc_name}_${fomrated_date}.docx`;
 
     const blob = await put(outputFilename, buffer, {
