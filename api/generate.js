@@ -12,11 +12,8 @@ const NAME_FILE_MAP = {
 };
 
 function splitProducts(products) {
-  let countEras = 1;
-  let countNonEras = 1;
-
   const eras_programs = [];
-  const nonErasMap = new Map(); // ключ — associated_program_id__sync_
+  const nonErasMap = new Map();
 
   for (const product of products) {
     const props = product.properties || {};
@@ -29,7 +26,7 @@ function splitProducts(products) {
 
     if (isEras) {
       eras_programs.push({
-        count: countEras++,
+        count: 1,
         acgme_id,
         specialty,
         ts_id,
@@ -39,7 +36,7 @@ function splitProducts(products) {
     } else {
       if (!nonErasMap.has(acgme_id)) {
         nonErasMap.set(acgme_id, {
-          count: countNonEras++,
+          count: 0,
           acgme_id,
           specialty,
           ts_id,
@@ -51,13 +48,14 @@ function splitProducts(products) {
 
       const entry = nonErasMap.get(acgme_id);
 
+      entry.count += 1;
+
       if (name.includes("core")) {
         entry.c_price = cost;
       } else if (name.includes("video")) {
         entry.v_price = cost;
       }
 
-      // Всегда пересчитываем total
       entry.t_price = entry.c_price + entry.v_price;
     }
   }
@@ -98,35 +96,8 @@ function getProductStats(products = []) {
   );
 }
 
-const example_of_data = {
-  institution_name: "Novant Health",
-  gme_id: "369558",
-  address: {
-    street: "19475 Old Jetton Road, Suite 200",
-    city: undefined,
-    state: "NC",
-    zip: "28031",
-  },
-  products: [
-    {
-      id: "27292540513",
-      properties: {
-        eras_program__sync_: "true",
-        associated_program_id__sync_: "1394800001",
-        cost: "4000",
-        hs_object_id: "27292540513",
-        product_name: "Thalamus Video",
-        specialty: "Clinical informatics (Internal medicine)",
-        thalamus_core_id__sync_: "11685",
-      },
-    },
-  ],
-};
-
 module.exports = async (req, res) => {
   const { doc_name, data } = req.body;
-
-  console.log(data);
 
   const { street, city, state, zip } = data.address || {};
   const parts = [street, city, state, zip].filter(Boolean);
