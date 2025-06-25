@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const PizZip = require("pizzip");
 const Docxtemplater = require("docxtemplater");
+const os = require("os");
 
 const NAME_FILE_MAP = {
   Institutional_v250507: "Institutional_v250507.docx",
@@ -109,8 +110,8 @@ module.exports = async (req, res) => {
     institution_name: data.institution_name,
     gme_id: data.gme_id,
     customer_address: parts.join(", "),
-    eras_programs: eras_programs,
-    non_eras_programs: non_eras_programs,
+    e_progs: eras_programs,
+    ne_progs: non_eras_programs,
     ...stats,
   };
 
@@ -149,18 +150,17 @@ module.exports = async (req, res) => {
     doc.setData(dataForDocument);
     doc.render();
 
-    const buffer = doc
-      .getZip()
-      .generate({ type: "nodebuffer" })
-      .toString("base64");
+    const buffer = doc.getZip().generate({ type: "nodebuffer" });
+    const outputFilename = `Talamus_quote_${doc_name}_${Date.now()}.docx`;
+    const outputPath = path.join(os.tmpdir(), outputFilename);
+
+    fs.writeFileSync(outputPath, buffer);
 
     res.send({
       success: true,
       message: "DOCX document generated",
-      filename: `institution_quote_${Date.now()}.docx`,
-      document: buffer,
-      mimeType:
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      filename: outputFilename,
+      url: `http://localhost:3000/api/download/${outputFilename}`,
     });
   } catch (err) {
     return res
