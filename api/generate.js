@@ -3,6 +3,9 @@ const path = require("path");
 const PizZip = require("pizzip");
 const Docxtemplater = require("docxtemplater");
 const os = require("os");
+require("dotenv").config(); // Добавьте это в самом начале файла
+
+const { put } = require("@vercel/blob");
 
 const NAME_FILE_MAP = {
   Institutional_v250507: "Institutional_v250507.docx",
@@ -115,8 +118,6 @@ module.exports = async (req, res) => {
     ...stats,
   };
 
-  console.log(dataForDocument);
-
   const templateFilename = NAME_FILE_MAP[doc_name];
 
   if (!templateFilename) {
@@ -147,20 +148,26 @@ module.exports = async (req, res) => {
       linebreaks: true,
     });
 
-    doc.setData(dataForDocument);
-    doc.render();
+    doc.render(dataForDocument);
 
     const buffer = doc.getZip().generate({ type: "nodebuffer" });
     const outputFilename = `Talamus_quote_${doc_name}_${Date.now()}.docx`;
-    const outputPath = path.join(os.tmpdir(), outputFilename);
 
-    fs.writeFileSync(outputPath, buffer);
+    const blob = await put(outputFilename, buffer, {
+      access: "public",
+      addRandomSuffix: false,
+      contentType:
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
 
-    res.send({
+    console.log("blob", blob);
+
+    return res.send({
       success: true,
-      message: "DOCX document generated",
+      message: "Document uploaded",
       filename: outputFilename,
-      url: `http://localhost:3000/api/download/${outputFilename}`,
+      url: blob.url,
     });
   } catch (err) {
     return res
