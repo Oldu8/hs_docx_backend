@@ -17,8 +17,8 @@ module.exports = async (req, res) => {
   const { street, city, state, zip } = data.address || {};
   const parts = [street, city, state, zip].filter(Boolean);
 
-  const stats = getProductStats(data.products);
   const { eras_programs, non_eras_programs } = splitProducts(data.products);
+  const stats = getProductStats(data.products);
 
   const dataForDocument = {
     institution_name: data.institution_name,
@@ -27,6 +27,9 @@ module.exports = async (req, res) => {
     e_progs: eras_programs,
     ne_progs: non_eras_programs,
     ...stats,
+    non_eras_count: non_eras_programs.length,
+    eras_count: eras_programs.length,
+    all_count: eras_programs.length + non_eras_programs.length,
   };
 
   const templateFilename = NAME_FILE_MAP[doc_name];

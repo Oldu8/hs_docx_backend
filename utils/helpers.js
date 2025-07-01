@@ -21,7 +21,7 @@ function splitProducts(products) {
 
     if (isEras) {
       eras_programs.push({
-        count: 1,
+        idx: eras_programs.length + 1,
         acgme_id,
         specialty,
         ts_id,
@@ -31,7 +31,7 @@ function splitProducts(products) {
     } else {
       if (!nonErasMap.has(acgme_id)) {
         nonErasMap.set(acgme_id, {
-          count: 0,
+          idx: nonErasMap.size + 1,
           acgme_id,
           specialty,
           ts_id,
@@ -43,17 +43,27 @@ function splitProducts(products) {
 
       const entry = nonErasMap.get(acgme_id);
 
-      entry.count += 1;
-
       if (name.includes("core")) {
         entry.c_price = cost;
       } else if (name.includes("video")) {
         entry.v_price = cost;
       }
-
-      entry.t_price = entry.c_price + entry.v_price;
     }
   }
+
+  // Format all prices after computation is complete
+  eras_programs.forEach((program) => {
+    program.v_price = formatNumber(program.v_price);
+    program.t_price = formatNumber(program.t_price);
+  });
+
+  nonErasMap.forEach((entry) => {
+    const cPriceNum = entry.c_price;
+    const vPriceNum = entry.v_price;
+    entry.c_price = formatNumber(cPriceNum);
+    entry.v_price = formatNumber(vPriceNum);
+    entry.t_price = formatNumber(cPriceNum + vPriceNum);
+  });
 
   const non_eras_programs = Array.from(nonErasMap.values());
 
@@ -61,21 +71,18 @@ function splitProducts(products) {
 }
 
 function getProductStats(products = []) {
-  return products.reduce(
+  const stats = products.reduce(
     (acc, product) => {
       const { cost, eras_program__sync_ } = product.properties || {};
       const numericCost = parseFloat(cost) || 0;
       const isEras = eras_program__sync_ === "true";
 
-      acc.all_count += 1;
       acc.total += numericCost;
 
       if (isEras) {
         acc.e_sum += numericCost;
-        acc.eras_count += 1;
       } else {
         acc.ne_sum += numericCost;
-        acc.non_eras_count += 1;
       }
 
       return acc;
@@ -83,16 +90,28 @@ function getProductStats(products = []) {
     {
       e_sum: 0,
       ne_sum: 0,
-      all_count: 0,
-      eras_count: 0,
-      non_eras_count: 0,
       total: 0,
     }
   );
+
+  // Format all sum values after computation
+  return {
+    e_sum: formatNumber(stats.e_sum),
+    ne_sum: formatNumber(stats.ne_sum),
+    total: formatNumber(stats.total),
+  };
+}
+
+function formatNumber(value) {
+  if (typeof value !== "number" || isNaN(value)) {
+    return "0";
+  }
+  return value.toLocaleString("en-US").replace(/,/g, " ");
 }
 
 module.exports = {
   NAME_FILE_MAP,
   splitProducts,
   getProductStats,
+  formatNumber,
 };
