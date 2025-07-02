@@ -12,11 +12,11 @@ function splitProducts(products) {
 
   for (const product of products) {
     const props = product.properties || {};
-    const isEras = props.eras_program__sync_ === "true";
-    const acgme_id = props.associated_program_id__sync_ || "";
+    const isEras = props.eras_program === "true";
+    const acgme_id = props.associated_program_id || "";
     const specialty = props.specialty || "";
     const ts_id = props.thalamus_core_id__sync_ || "";
-    const cost = parseFloat(props.cost) || 0;
+    const cost = parseFloat(props.amount) || 0;
     const name = (props.product_name || "").toLowerCase();
 
     if (isEras) {
@@ -73,9 +73,9 @@ function splitProducts(products) {
 function getProductStats(products = []) {
   const stats = products.reduce(
     (acc, product) => {
-      const { cost, eras_program__sync_ } = product.properties || {};
-      const numericCost = parseFloat(cost) || 0;
-      const isEras = eras_program__sync_ === "true";
+      const { amount, eras_program } = product.properties || {};
+      const numericCost = parseFloat(amount) || 0;
+      const isEras = eras_program === "true";
 
       acc.total += numericCost;
 
@@ -109,9 +109,19 @@ function formatNumber(value) {
   return value.toLocaleString("en-US").replace(/,/g, " ");
 }
 
+function sanitizeFilename(name) {
+  return name
+    .normalize("NFKD")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/[\s_-]+/g, "_")
+    .toLowerCase();
+}
+
 module.exports = {
   NAME_FILE_MAP,
   splitProducts,
   getProductStats,
   formatNumber,
+  sanitizeFilename,
 };

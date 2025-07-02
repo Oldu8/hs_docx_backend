@@ -8,6 +8,7 @@ const { put } = require("@vercel/blob");
 const {
   NAME_FILE_MAP,
   splitProducts,
+  sanitizeFilename,
   getProductStats,
 } = require("../utils/helpers");
 
@@ -73,7 +74,9 @@ module.exports = async (req, res) => {
       })
       .replace(/\//g, "_");
 
-    const outputFilename = `${deal_name}_${doc_name}_${fomrated_date}.docx`;
+    const validDealName = sanitizeFilename(deal_name);
+    const validDocName = sanitizeFilename(doc_name);
+    const outputFilename = `${validDealName}_${validDocName}_${fomrated_date}.docx`;
 
     const blob = await put(outputFilename, buffer, {
       access: "public",
