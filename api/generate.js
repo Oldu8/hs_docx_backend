@@ -4,7 +4,7 @@ const PizZip = require("pizzip");
 const Docxtemplater = require("docxtemplater");
 require("dotenv").config();
 
-const { put } = require("@vercel/blob");
+const { put, del } = require("@vercel/blob");
 const {
   NAME_FILE_MAP,
   splitProducts,
@@ -77,6 +77,14 @@ module.exports = async (req, res) => {
     const validDealName = sanitizeFilename(deal_name);
     const validDocName = sanitizeFilename(doc_name);
     const outputFilename = `${validDealName}_${validDocName}_${fomrated_date}.docx`;
+
+    try {
+      await del(outputFilename, {
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+      });
+    } catch (err) {
+      console.warn("No file to delete:", err.message);
+    }
 
     const blob = await put(outputFilename, buffer, {
       access: "public",
