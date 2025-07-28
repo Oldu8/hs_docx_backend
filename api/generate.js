@@ -33,6 +33,7 @@ module.exports = async (req, res) => {
     all_count: eras_programs.length + non_eras_programs.length,
   };
 
+  // console.log("ready data:::", dataForDocument);
   const templateFilename = NAME_FILE_MAP[doc_name];
 
   if (!templateFilename) {
@@ -66,7 +67,7 @@ module.exports = async (req, res) => {
     doc.render(dataForDocument);
 
     const buffer = doc.getZip().generate({ type: "nodebuffer" });
-    const fomrated_date = new Date()
+    const formatted_date = new Date()
       .toLocaleDateString("en-US", {
         month: "2-digit",
         day: "2-digit",
@@ -74,17 +75,17 @@ module.exports = async (req, res) => {
       })
       .replace(/\//g, "_");
 
+    const timestamp = Date.now();
     const validDealName = sanitizeFilename(deal_name);
     const validDocName = sanitizeFilename(doc_name);
-    const outputFilename = `${validDealName}_${validDocName}_${fomrated_date}.docx`;
-
-    try {
-      await del(outputFilename, {
-        token: process.env.BLOB_READ_WRITE_TOKEN,
-      });
-    } catch (err) {
-      console.warn("No file to delete:", err.message);
-    }
+    const outputFilename = `${validDealName}_${validDocName}_${formatted_date}_${timestamp}.docx`;
+    // try {
+    //   await del(outputFilename, {
+    //     token: process.env.BLOB_READ_WRITE_TOKEN,
+    //   });
+    // } catch (err) {
+    //   console.warn("No file to delete:", err.message);
+    // }
 
     const blob = await put(outputFilename, buffer, {
       access: "public",
