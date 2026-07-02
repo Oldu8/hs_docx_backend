@@ -1,0 +1,13 @@
+{
+  "type": "crm-card",
+  "data": {
+    "title": "Generate your document",
+    "description": "Create card, to get deal data to template and generate a Word document",
+    "location": "crm.record.sidebar",
+    "uid": "hs_generator_app",
+    "module": {
+      "file": "Card.jsx"
+    },
+    "objectTypes": [{ "name": "deals" }]
+  }
+}

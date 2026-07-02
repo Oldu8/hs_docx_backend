@@ -1,0 +1,15 @@
+{
+  "name": "hs_generator",
+  "version": "1.0.0",
+  "description": "UI Extension for HubSpot",
+  "license": "MIT",
+  "main": "Card.jsx",
+  "scripts": {
+    "dev": "hs-ui-extensions-dev-server dev",
+    "build": "hs-ui-extensions-dev-server build"
+  },
+  "dependencies": {
+    "@hubspot/ui-extensions": "latest",
+    "react": "^18.2.0"
+  }
+}

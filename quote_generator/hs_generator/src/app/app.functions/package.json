@@ -1,0 +1,12 @@
+{
+  "name": "generate-document-functions",
+  "version": "1.0.0",
+  "description": "Serverless functions for generate document",
+  "main": "generate.js",
+  "dependencies": {
+    "@hubspot/api-client": "^7.2.0",
+    "docx": "^9.5.1",
+    "docxtemplater": "^3.65.0",
+    "pizzip": "^3.2.0"
+  }
+}

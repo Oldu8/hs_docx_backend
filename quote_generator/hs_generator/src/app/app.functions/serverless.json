@@ -1,0 +1,8 @@
+{
+  "appFunctions": {
+    "generate": {
+      "file": "generate.js",
+      "secrets": []
+    }
+  }
+}

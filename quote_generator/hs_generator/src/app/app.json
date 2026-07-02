@@ -1,0 +1,22 @@
+{
+  "name": "HS Document Generator",
+  "version": "1.0.0",
+  "description": "Get deal data to template and generate a Word document",
+  "scopes": [
+    "crm.objects.deals.read",
+    "crm.objects.deals.write",
+    "crm.objects.custom.read",
+    "crm.objects.custom.write"
+  ],
+  "uid": "hs_generator_app",
+  "public": false,
+  "extensions": {
+    "crm": {
+      "cards": [
+        {
+          "file": "extensions/card.json"
+        }
+      ]
+    }
+  }
+}
