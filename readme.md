@@ -38,11 +38,10 @@ Returns a JSON object:
 
 Use one of these values for `doc_name`:
 
-- `Institutional_v250507`
-- `Departmental_v250507`
-- `MSA_v250321`
-- `MSA_SOW_v250321`
-- `CSA_SOW_v250609`
+- `Institutional_v260619`
+- `Departmental_v260619`
+- `MSA_v260619`
+- `MSA_SOW_v260619`
 
 ---
 
@@ -53,7 +52,7 @@ Use one of these values for `doc_name`:
 ```json
 {
   "deal_name": "Test Deal",
-  "doc_name": "Institutional_v250507",
+  "doc_name": "Institutional_v260619",
   "data": {
     "institution_name": "Sample Hospital",
     "gme_id": "GME12345",
@@ -84,7 +83,7 @@ Use one of these values for `doc_name`:
 ```json
 {
   "deal_name": "Complex Deal",
-  "doc_name": "CSA_SOW_v250609",
+  "doc_name": "MSA_SOW_v260619",
   "data": {
     "institution_name": "Advanced Medical Center",
     "gme_id": "GME67890",

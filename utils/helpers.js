@@ -1,9 +1,8 @@
 const NAME_FILE_MAP = {
-  Institutional_v250507: "Institutional_v250507.docx",
-  Departmental_v250507: "Departmental_v250507.docx",
-  MSA_v250321: "MSA_v250321.docx",
-  MSA_SOW_v250321: "MSA_SOW_v250321.docx",
-  CSA_SOW_v250609: "CSA_SOW_v250609.docx",
+  Institutional_v260619: "Institutional_v260619.docx",
+  Departmental_v260619: "Departmental_v260619.docx",
+  MSA_v260619: "MSA_v260619.docx",
+  MSA_SOW_v260619: "MSA_SOW_v260619.docx",
 };
 
 function splitProducts(products) {
